@@ -13,14 +13,14 @@ function speak(text) {
     const text_speak = new SpeechSynthesisUtterance(text);
     text_speak.rate = 1;
     text_speak.volume = 1;
-    text_speak.pitch = 1;
+    text_speak.pitch = 1.8;
     window.speechSynthesis.speak(text_speak);
 }
 
 function wishMe() {
     var day = new Date();
     var hour = day.getHours();
-
+    
     if (hour >= 0 && hour < 12) {
         speak("Good Morning Boss...");
     } else if (hour >= 12 && hour < 17) {
@@ -53,7 +53,88 @@ function takeCommand(message) {
     else if (message.includes('date')) {
         const date = new Date().toLocaleString(undefined, { month: "short", day: "numeric" });
         speak(`Today's date is ${date}`);
+    } ///changes kiya
+    else if (message.includes('weather')) {
+        let city = getSearchQuery(message, "weather");
+        if (city) {
+            window.open(`https://www.google.com/search?q=weather+in+${city}`, "_blank");
+            speak(`Fetching weather information for ${city}...`);
+        } else {
+            speak("Please specify a city to get the weather information.");
+        }
+    }
+    else if (message.includes('play music')) {
+        let song = getSearchQuery(message, "play music");
+        if (song) {
+            window.open(`https://www.youtube.com/results?search_query=${song}`, "_blank");
+            speak(`Playing ${song} on YouTube...`);
+        } else {
+            speak("Please specify a song or artist.");
+        }
+    }
+    else if (message.includes('send email')) {
+        let emailContent = getSearchQuery(message, "send email");
+        if (emailContent) {
+            // Assuming you have an email API setup
+            sendEmailAPI(emailContent);  
+            speak(`Sending your email: ${emailContent}`);
+        } else {
+            speak("Please provide content to send in the email.");
+        }
+    }
+    else if (message.includes('set reminder')) {
+        let reminder = getSearchQuery(message, "set reminder");
+        if (reminder) {
+            setReminder(reminder);  // Implement a function to set reminders
+            speak(`Reminder set: ${reminder}`);
+        } else {
+            speak("Please specify what reminder to set.");
+        }
+    }
+    else if (message.includes('open github')) {
+        window.open("https://github.com", "_blank");
+        speak("Opening GitHub...");
     } 
+    else if (message.includes('open stackoverflow')) {
+        window.open("https://stackoverflow.com", "_blank");
+        speak("Opening StackOverflow...");
+    }
+    else if (message.includes('tell me a joke')) {
+        let jokes = [
+            "Why don't programmers like nature? It has too many bugs.",
+            "Why do Java developers wear glasses? Because they don’t C#.",
+            "I would tell you a UDP joke, but you might not get it."
+        ];
+        let randomJoke = jokes[Math.floor(Math.random() * jokes.length)];
+        speak(randomJoke);
+    }
+    else if (message.includes('motivate me')) {
+        let quotes = [
+            "The only way to do great work is to love what you do. - Steve Jobs",
+            "Success is not the key to happiness. Happiness is the key to success.",
+            "Your limitation—it's only your imagination."
+        ];
+        let randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+        speak(randomQuote);
+    }
+    else if (message.includes('increase volume')) {
+        let video = document.querySelector("video, audio");
+        if (video) {
+            video.volume = Math.min(video.volume + 0.1, 1);
+            speak("Increasing the volume.");
+        } else {
+            speak("No media found.");
+        }
+    } 
+    else if (message.includes('decrease volume')) {
+        let video = document.querySelector("video, audio");
+        if (video) {
+            video.volume = Math.max(video.volume - 0.1, 0);
+            speak("Decreasing the volume.");
+        } else {
+            speak("No media found.");
+        }
+    }// this line changes kiya                                 
     else if (message.includes('battery')) {
                 checkBatteryStatus();
             } 
@@ -90,9 +171,8 @@ recognition.start();
 
 window.addEventListener('load', () => {
     speak("Initializing JARVIS..");
-    speak("System Start: Powering up all modules...");
-    speak("Checking Network Connection: Network is online..");
-    speak("Running Diagnostics: All systems are operational..");
+    speak("System Start: Network is online...");
+    speak("All systems are operational..");
     wishMe();
 });
 
